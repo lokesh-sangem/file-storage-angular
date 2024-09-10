@@ -1,0 +1,112 @@
+<!-- app.component.html -->
+
+<div class="container">
+  <h2 class="text-center">Receipt Form</h2>
+
+  <form [formGroup]="receiptForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <!-- Random ID -->
+      <div class="form-group col-md-6">
+        <label for="randomId">Random ID:</label>
+        <input type="text" id="randomId" formControlName="randomId" class="form-control" readonly>
+      </div>
+
+      <!-- Start Date -->
+      <div class="form-group col-md-6">
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" formControlName="startDate" class="form-control" [max]="receiptForm.get('endDate')?.value">
+        <div *ngIf="receiptForm.get('startDate')?.errors?.['startDateInvalid']" class="text-danger">
+          *Start date cannot be greater than the end date.
+        </div>
+        <div *ngIf="receiptForm.get('startDate')?.touched && receiptForm.get('startDate')?.hasError('required')" class="text-danger">
+          *Start Date must not be empty.
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- End Date -->
+      <div class="form-group col-md-6">
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" formControlName="endDate" class="form-control" [max]="today">
+        <div *ngIf="receiptForm.get('endDate')?.errors?.['endDateInvalid']" class="text-danger">
+          *End date cannot be greater than today's date.
+        </div>
+        <div *ngIf="receiptForm.get('endDate')?.touched && receiptForm.get('endDate')?.hasError('required')" class="text-danger">
+          *End Date must not be empty.
+        </div>
+      </div>
+
+      <!-- Receipt Date -->
+      <div class="form-group col-md-6">
+        <label for="receiptDate">Receipt Date:</label>
+        <input type="date" id="receiptDate" formControlName="receiptDate" class="form-control" [max]="today">
+        <div *ngIf="receiptForm.get('receiptDate')?.errors?.['futureDateInvalid']" class="text-danger">
+          *Receipt date cannot be a future date.
+        </div>
+        <div *ngIf="receiptForm.get('receiptDate')?.touched && receiptForm.get('receiptDate')?.hasError('required')" class="text-danger">
+          *Receipt date is required.
+        </div>
+      </div>
+    </div>
+
+    <!-- File Upload -->
+    <div class="form-group">
+      <label for="fileUpload">Upload File:</label>
+      <input type="file" id="fileUpload" (change)="onFileSelected($event)" class="form-control">
+      <div *ngIf="receiptForm.get('fileUpload')?.errors?.['fileTypeInvalid']" class="text-danger">
+        *Only .pdf, .jpeg, .xls files are allowed.
+      </div>
+      <div *ngIf="receiptForm.get('fileUpload')?.errors?.['fileSizeInvalid']" class="text-danger">
+        *File size must be less than 2MB.
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary btn-block mt-3" [disabled]="receiptForm.invalid">Submit</button>
+  </form>
+
+
+
+    <!-- Download Cart -->
+    <h3 class="text-center mt-5">Download Cart ({{ downloadCart.length }} files)</h3>
+    <ul class="list-group">
+      <li *ngFor="let file of downloadCart; let i = index" class="list-group-item d-flex justify-content-between align-items-center">
+        {{ file.fileName }}
+        <button class="btn btn-danger btn-sm" (click)="removeFromCart(i)">Remove from Cart</button>
+      </li>
+    </ul>
+    <button class="btn btn-success btn-block mt-3" (click)="downloadAllFiles()" [disabled]="downloadCart.length === 0">Download All</button>
+  </div>
+
+  
+  <!-- Todo List Table -->
+  <h3 class="text-center mt-5">Submitted Data</h3>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover mt-3">
+      <thead class="thead-dark">
+        <tr>
+          <th>Random ID</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Receipt Date</th>
+          <th>File Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of todoList">
+          <td>{{ item.randomId }}</td>
+          <td>{{ item.startDate }}</td>
+          <td>{{ item.endDate }}</td>
+          <td>{{ item.receiptDate }}</td>
+          <td>{{ item.fileName }}</td>
+          <td>
+            <button class="btn btn-success btn-sm" (click)="addToDownloadCart(item)">Download</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
